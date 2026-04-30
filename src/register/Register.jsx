@@ -4,6 +4,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext.jsx';
+import { IoEyeSharp } from "react-icons/io5";
+import { FaEyeSlash } from "react-icons/fa";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -39,7 +41,7 @@ const Register = () => {
                 console.log(data.message);
             }
             toast.success(data?.message)
-            localStorage.setItem('CHAT_APP', JSON.stringify(data));
+            localStorage.setItem('chat_app', JSON.stringify(data));
             setAuthUser(data)
             setLoading(false)
             navigate('/login');
@@ -112,7 +114,7 @@ const Register = () => {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className='absolute right-3 cursor-pointer'
                             >
-                                {showPassword ? "🔓" : "🔒"}
+                                {showPassword ? <IoEyeSharp /> : <FaEyeSlash />}
                             </span>
                         </div>
                     </div>
@@ -134,7 +136,7 @@ const Register = () => {
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                 className='absolute right-3 cursor-pointer'
                             >
-                                {showConfirmPassword ? "🔓" : "🔒"}
+                                {showConfirmPassword ? <IoEyeSharp /> : <FaEyeSlash />}
                             </span>
                         </div>
                     </div>

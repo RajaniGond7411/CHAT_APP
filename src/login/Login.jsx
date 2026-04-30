@@ -7,6 +7,8 @@ import axios from 'axios';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../context/AuthContext.jsx';
+import { IoEyeSharp } from "react-icons/io5";
+import { FaEyeSlash } from "react-icons/fa";
 
 
 const Login = () => {
@@ -36,7 +38,7 @@ const Login = () => {
         console.log(data.message)
       }
       toast.success(data.message)
-      localStorage.setItem('CHAT_APP', JSON.stringify(data));
+      localStorage.setItem('chat_app', JSON.stringify(data));
       setAuthUser(data);
       setLoading(false);
       navigate('/');
@@ -85,7 +87,7 @@ const Login = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 className='absolute right-3 cursor-pointer'
               >
-                {showPassword ? "🔓" : "🔒"}
+                {showPassword ? <IoEyeSharp />: <FaEyeSlash />}
               </span>
             </div>
           </div>

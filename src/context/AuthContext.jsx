@@ -8,11 +8,11 @@ export const useAuth = () => {
 };
 
 export const AuthContextProvider = ({ children }) => {
-    const [authUser, setAuthUser] = useState(JSON.parse(localStorage.getItem("CHAT_APP")) || null);
+    const [authUser, setAuthUser] = useState(JSON.parse(localStorage.getItem("chat_app")) || null);
 
     return (
         <AuthContext.Provider value={{ authUser, setAuthUser }}>
             {children}
         </AuthContext.Provider>
     );
-};
+};  
