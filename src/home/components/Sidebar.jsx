@@ -8,7 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import { BiLogOutCircle } from "react-icons/bi";
 import userConversation from '../../Zustand/useConversation.js';
 
-const Sidebar = () => {
+const Sidebar = ({ onSelectUser }) => {
+
+
     const navigate = useNavigate();
     const { authUser, setAuthUser } = useAuth();
     const [searchInput, setSearchInput] = useState('');
@@ -21,14 +23,15 @@ const Sidebar = () => {
 
     useEffect(() => {
         const chatUserHandler = async () => {
+            if (chatUser.length > 0) return;
             setLoading(true);
             try {
-                const chatters = await axios.get('/api/user/currentchatters');
+                const chatters = await axios.get(`/api/user/currentchatters`);
                 setChatUser(chatters.data);
-                setLoading(false);
             } catch (error) {
-                setLoading(false);
                 console.log(error);
+            } finally {
+                setLoading(false);
             }
         };
         chatUserHandler();
@@ -58,6 +61,7 @@ const Sidebar = () => {
     };
 
     const handleUserClick = (user) => {
+        onSelectUser(user);
         setSelectedConversation(user);
         setSelectedUserId(user?._id);
 
@@ -69,7 +73,7 @@ const Sidebar = () => {
         if (confirmlogout === authUser.username) {
             setLoading(true)
             try {
-                const logout = await axios.post('/api/auth/logout')
+                const logout = await axios.post(`/api/auth/logout`)
                 const data = logout.data;
                 if (data?.success === false) {
                     setLoading(false)
@@ -91,7 +95,7 @@ const Sidebar = () => {
     }
 
     return (
-        <div className='h-full w-auto px-1 border-r border-gray-700 '>
+        <div className='h-full w-auto px-1'>
             <div className='flex justify-between gap-2'>
                 <form onSubmit={handleSearchSubmit} className='w-full flex items-center justify-between bg-white rounded-full'>
 
