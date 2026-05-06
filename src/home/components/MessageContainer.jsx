@@ -4,12 +4,22 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { PiChatsFill } from "react-icons/pi";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from 'axios';
+import { BiSolidSend } from "react-icons/bi";
 
 const MessageContainer = ({ onBackUser }) => {
   const { messages, selectedConversation, setMessage, setSelectedConversation } = userConversation();
   const { authUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendData, setSendData] = useState("");
   const lastMessageRef = useRef();
+
+  useEffect(() => {
+    setTimeout(() => {
+      lastMessageRef?.current?.scrollIntoView({ behavior: "smooth" })
+    }, 100)
+
+  }, [messages])
 
   useEffect(() => {
     const getMessages = async () => {
@@ -33,8 +43,30 @@ const MessageContainer = ({ onBackUser }) => {
   }, [selectedConversation?._id, setMessage])
   console.log(messages);
 
+  const handleMessages = (e) => {
+    setSendData(e.target.value)
+  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSending(true);
+    try {
+      const res = await axios.post(`/api/message/send/${selectedConversation?._id}`,
+        { messages: sendData });
+      const data = await res.data;
+      if (data.success === false) {
+        setSending(false);
+        console.log(data.message);
+      }
+      setSending(false);
+      setMessage([...messages, data])
+    } catch (error) {
+      setSending(false);
+      console.log(error);
+    }
+  }
+
   return (
-    <div className="md:min-w-125 h-full flex-col py-2">
+    <div className="md:min-w-125 h-[99%] flex flex-col py-2">
       {selectedConversation === null ? (
         <div className='flex items-center justify-center w-full h-full'>
           <div className='px-4 text-center text-2xl text-gray-950
@@ -73,10 +105,10 @@ const MessageContainer = ({ onBackUser }) => {
             <p className='text-center text-white items-center'><i>Start a Conversation..</i></p>
           )}
           {!loading && messages?.length > 0 && messages?.map((message) => (
-            <div className='text-white' key={message?._id} ref={lastMessageRef}>
+            <div className='' key={message?._id} ref={lastMessageRef}>
               <div className={`chat ${message.senderId === authUser._id ? 'chat-end' : 'chat-start'}`}>
                 <div className='chat-image avatar'></div>
-                <div className={`chat-bubble ${message.senderId === authUser._id ? 'bg-blue-600' : ''}`}>
+                <div className={`chat-bubble ${message.senderId === authUser._id ? 'bg-sky-600' : ''}`}>
                   {message?.message}
                 </div>
                 <div className='chat-footer text-[10px] opacity-80'>
@@ -87,9 +119,19 @@ const MessageContainer = ({ onBackUser }) => {
             </div>
           ))}
         </div>
-      </>)
-      }
-
+        <form onSubmit={handleSubmit} className='rounded-full text-black'>
+          <div className='w-full rounded-full flex items-center bg-white'>
+            <input value={sendData} onChange={handleMessages} required id='message' type='text'
+              className='w-full bg-transparent outline-none px-4 rounded-full' />
+            <button type='submit'>
+              {sending ? <div className='loading loading-spinner'></div> :
+                <BiSolidSend size={20}
+                  className='text-sky-700 cursor-pointer rounded-full bg-gray-800 w-10 h-auto p-1' />
+              }
+            </button>
+          </div>
+        </form>
+      </>)}
     </div>
   )
 }
