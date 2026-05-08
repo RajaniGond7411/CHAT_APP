@@ -5,14 +5,27 @@ import { PiChatsFill } from "react-icons/pi";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import axios from 'axios';
 import { BiSolidSend } from "react-icons/bi";
+import { useSocketContext } from '../../context/socketContext.jsx';
+import notify from '../../assets/sound/notificationSound.mp3';
 
 const MessageContainer = ({ onBackUser }) => {
   const { messages, selectedConversation, setMessage, setSelectedConversation } = userConversation();
+  const { socket } = useSocketContext();
   const { authUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendData, setSendData] = useState("");
   const lastMessageRef = useRef();
+
+  useEffect(() => {
+    socket?.on("newMessage", (newMessage) => {
+      const sound = new Audio(notify);
+      sound.play();
+      setMessage([...messages, newMessage])
+    })
+
+    return () => socket?.off("newMessage");
+  }, [socket, setMessage, messages])
 
   useEffect(() => {
     setTimeout(() => {
