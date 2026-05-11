@@ -12,7 +12,7 @@ const io = new Server(server, {
     }
 });
 
-const userSocketmap = {}; // {userId: socketId}
+const userSocketmap = {}; 
 
 export const getReceiverSocketId = (receiverId) => {
     return userSocketmap[receiverId];

@@ -5,6 +5,8 @@ import { Route, Routes } from "react-router-dom";
 import Register from "./register/Register.jsx";
 import Home from "./home/Home.jsx";
 import { VerifyUser } from "./utils/verifyUser.jsx";
+import Profile from "./home/components/Profile.jsx";
+
 
 function App() {
 
@@ -17,6 +19,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route element={<VerifyUser/>}>
             <Route path="/" element={<Home />} />
+            <Route path="/profile/:id" element={<Profile />}>
+            </Route>
           </Route>
         </Routes>
         <ToastContainer />

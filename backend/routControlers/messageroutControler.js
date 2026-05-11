@@ -73,3 +73,27 @@ export const getMessages = async (req, res) => {
     }
 
 }
+
+
+export const deleteMultipleMessages = async (req, res) => {
+    try {
+        const { messageIds, conversationId } = req.body; // messageIds is an array [id1, id2...]
+
+        if (!messageIds || messageIds.length === 0) {
+            return res.status(400).json({ error: "No messages selected" });
+        }
+
+        // 1. Delete all selected messages from the Message collection
+        await Message.deleteMany({ _id: { $in: messageIds } });
+
+        // 2. Remove all those IDs from the Conversation's messages array
+        await Conversation.findByIdAndUpdate(conversationId, {
+            $pull: { messages: { $in: messageIds } }
+        });
+
+        res.status(200).json({ message: "Messages deleted successfully" });
+    } catch (error) {
+        console.log("Error in deleteMultipleMessages:", error.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};

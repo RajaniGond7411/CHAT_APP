@@ -63,6 +63,7 @@ export const userLogin = async (req, res) => {
             username: user.username,
             profilepic: user.profilepic,
             email: user.email,
+            gender: user.gender,
             success: true,
             message: "Successfully Logged in"
         })
@@ -76,12 +77,16 @@ export const userLogin = async (req, res) => {
     }
 }
 
+
 export const userLogout = async (req, res) => {
     try {
         res.cookie("jwt", "", {
             maxAge: 0
         })
-        res.status(200).send({ success:true ,message: "User Logged out" })
+        res.status(200).send({
+            success: true,
+            message: "User Logged out"
+        })
     } catch (error) {
         res.status(500).send({
             success: false,
@@ -90,3 +95,68 @@ export const userLogout = async (req, res) => {
         console.log(error);
     }
 }
+
+export const updateUsername = async (req, res) => {
+    try {
+        const { userId, username } = req.body;
+
+        // Check if username is already taken by another user
+        const existingUser = await User.findOne({ username });
+        if (existingUser && existingUser._id.toString() !== userId) {
+            return res.status(400).json({ error: "Username already exists!" });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { username },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: "Username updated successfully",
+            username: updatedUser.username
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const updateFullname = async (req, res) => {
+    try {
+        const { userId, fullname } = req.body;
+
+        if (!fullname) return res.status(400).json({ error: "Fullname is required" });
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { fullname },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: "Fullname updated successfully",
+            fullname: updatedUser.fullname
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const updateGender = async (req, res) => {
+    try {
+        const { userId, gender } = req.body;
+
+        if (!gender) return res.status(400).json({ error: "Gender is required" });
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            { gender }, 
+            { new: true }
+        ).select("-password");
+
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.log("Error in updateGender controller", error.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
